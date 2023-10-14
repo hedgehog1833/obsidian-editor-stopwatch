@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { ItemView, moment, WorkspaceLeaf } from 'obsidian';
 import { StopwatchButtons } from './StopwatchButtons';
 import ReactDOM, { Root } from 'react-dom/client';
 import React from 'react';
@@ -14,7 +14,7 @@ export class TimetrackerView extends ItemView {
 	constructor(leaf: WorkspaceLeaf, plugin: Timetracker) {
 		super(leaf);
 		this.plugin = plugin;
-		this.stopwatchModel = new StopwatchModel(plugin);
+		this.stopwatchModel = new StopwatchModel();
 	}
 
 	getDisplayText(): string {
@@ -30,19 +30,8 @@ export class TimetrackerView extends ItemView {
 	}
 
 	getCurrentStopwatchTime(): string {
-		return this.stopwatchModel.getCurrentValue();
-	}
-
-	start(): StopwatchState {
-		return this.stopwatchModel.start();
-	}
-
-	stop(): StopwatchState {
-		return this.stopwatchModel.stop();
-	}
-
-	reset(): StopwatchState {
-		return this.stopwatchModel.reset();
+		const millis = this.stopwatchModel.getCurrentValue();
+		return this.getDateString(millis);
 	}
 
 	clickStartStop(): void {
@@ -64,7 +53,7 @@ export class TimetrackerView extends ItemView {
 		this.root = ReactDOM.createRoot(this.containerEl);
 		this.root.render(
 			<StopwatchButtons
-				plugin={this.plugin}
+				interval={this.plugin.settings.interval}
 				reset={() => this.reset()}
 				start={() => this.start()}
 				stop={() => this.stop()}
@@ -77,5 +66,28 @@ export class TimetrackerView extends ItemView {
 		if (this.root !== null && this.root !== undefined) {
 			this.root.unmount();
 		}
+	}
+
+	private start(): StopwatchState {
+		return this.stopwatchModel.start();
+	}
+
+	private stop(): StopwatchState {
+		return this.stopwatchModel.stop();
+	}
+
+	private reset(): StopwatchState {
+		return this.stopwatchModel.reset();
+	}
+
+	private getDateString(milliseconds: number): string {
+		const formattingSettings = !this.plugin.settings.trimLeadingZeros
+			? {
+					trim: 'false',
+			  }
+			: {
+					trim: 'left',
+			  };
+		return moment.duration(milliseconds).format(this.plugin.settings.format, formattingSettings);
 	}
 }

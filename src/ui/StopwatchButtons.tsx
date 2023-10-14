@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { StopwatchState } from '../stopwatch/StopwatchState';
-import Timetracker from '../main';
-import React from 'react';
 
 interface StopwatchButtonsProps {
-	plugin: Timetracker;
+	interval: number;
 	start: () => StopwatchState;
 	stop: () => StopwatchState;
 	reset: () => StopwatchState;
@@ -39,7 +37,7 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 		setIntervalId(
 			window.setInterval(() => {
 				setCurrentValue(props.getCurrentStopwatchTime());
-			}, props.plugin.settings.interval),
+			}, props.interval),
 		);
 	};
 

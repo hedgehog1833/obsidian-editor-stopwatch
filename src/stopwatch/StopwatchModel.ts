@@ -1,16 +1,9 @@
 import { StopwatchState } from './StopwatchState';
-import { moment } from 'obsidian';
-import Timetracker from '../main';
 
 export class StopwatchModel {
-	private plugin: Timetracker;
 	private startedAt: number = 0;
 	private pausedAtOffset: number = 0;
 	private state: StopwatchState = StopwatchState.INITIALIZED;
-
-	constructor(plugin: Timetracker) {
-		this.plugin = plugin;
-	}
 
 	start(): StopwatchState {
 		this.startedAt = Date.now();
@@ -31,23 +24,11 @@ export class StopwatchModel {
 		return this.state;
 	}
 
-	getCurrentValue(): string {
+	getCurrentValue(): number {
 		if (this.state === StopwatchState.STARTED) {
 			const now = Date.now();
-			const diff = now - this.startedAt + this.pausedAtOffset;
-			return this.getDateString(diff);
+			return now - this.startedAt + this.pausedAtOffset;
 		}
-		return this.getDateString(this.pausedAtOffset);
-	}
-
-	private getDateString(milliseconds: number): string {
-		const formattingSettings = !this.plugin.settings.trimLeadingZeros
-			? {
-					trim: 'false',
-			  }
-			: {
-					trim: 'left',
-			  };
-		return moment.duration(milliseconds).format(this.plugin.settings.format, formattingSettings);
+		return this.pausedAtOffset;
 	}
 }
