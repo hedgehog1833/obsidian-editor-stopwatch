@@ -3,6 +3,7 @@ import { TimetrackerView } from './ui/TimetrackerView';
 import { TimetrackerSettingTab } from './TimetrackerSettingTab';
 import { moment } from 'obsidian';
 import momentDurationFormatSetup from 'moment-duration-format';
+import { StopwatchState } from './stopwatch/StopwatchState';
 
 momentDurationFormatSetup(moment);
 
@@ -22,12 +23,13 @@ const DEFAULT_SETTINGS: TimetrackerSettings = {
 
 export default class Timetracker extends Plugin {
 	settings: TimetrackerSettings;
+	statusBarItem: HTMLElement;
 
 	async onload() {
 		await this.loadSettings();
 
 		this.registerView(TIMETRACKER_VIEW_TYPE, (leaf: WorkspaceLeaf) => {
-			return new TimetrackerView(leaf, this);
+			return new TimetrackerView(leaf, this, (state) => this.updateStatusBar(state));
 		});
 
 		this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
@@ -90,6 +92,8 @@ export default class Timetracker extends Plugin {
 			},
 		});
 
+		this.statusBarItem = this.addStatusBarItem();
+
 		this.addSettingTab(new TimetrackerSettingTab(this.app, this));
 	}
 
@@ -120,6 +124,18 @@ export default class Timetracker extends Plugin {
 			return leaf.view;
 		} else {
 			return null;
+		}
+	}
+
+	updateStatusBar(state: string): void {
+		if (this.statusBarItem && state) {
+			if (state == StopwatchState.STARTED) {
+				this.statusBarItem.setText('Timetracker: \u23F5');
+			} else if (state == StopwatchState.STOPPED) {
+				this.statusBarItem.setText('Timetracker: \u23F8');
+			} else {
+				this.statusBarItem.setText('');
+			}
 		}
 	}
 }

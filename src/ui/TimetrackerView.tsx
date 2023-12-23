@@ -10,11 +10,13 @@ export class TimetrackerView extends ItemView {
 	private readonly stopwatchModel: StopwatchModel;
 	private readonly plugin: Timetracker;
 	private root: Root;
+	private callback: (state: string) => void;
 
-	constructor(leaf: WorkspaceLeaf, plugin: Timetracker) {
+	constructor(leaf: WorkspaceLeaf, plugin: Timetracker, callback: (state: string) => void) {
 		super(leaf);
 		this.plugin = plugin;
 		this.stopwatchModel = new StopwatchModel(plugin);
+		this.callback = callback;
 	}
 
 	getDisplayText(): string {
@@ -27,6 +29,10 @@ export class TimetrackerView extends ItemView {
 
 	getIcon(): string {
 		return 'clock';
+	}
+
+	getTimetrackerState(): string {
+		return this.stopwatchModel.getTimetrackerState();
 	}
 
 	getCurrentStopwatchTime(): string {
@@ -76,6 +82,7 @@ export class TimetrackerView extends ItemView {
 				stop={() => this.stop()}
 				getCurrentStopwatchTime={() => this.getCurrentStopwatchTime()}
 				setCurrentStopwatchTime={(milliseconds: number) => this.setCurrentStopwatchTime(milliseconds)}
+				callback={this.callback}
 			/>,
 		);
 	}

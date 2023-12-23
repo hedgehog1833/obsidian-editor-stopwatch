@@ -11,6 +11,7 @@ interface StopwatchButtonsProps {
 	reset: () => StopwatchState;
 	getCurrentStopwatchTime: () => string;
 	setCurrentStopwatchTime: (milliseconds: number) => void;
+	callback: (state: string) => void;
 }
 
 export const StopwatchButtons = (props: StopwatchButtonsProps) => {
@@ -20,16 +21,22 @@ export const StopwatchButtons = (props: StopwatchButtonsProps) => {
 
 	const startOrStopStopwatch = () => {
 		if (stopwatchState !== StopwatchState.STARTED) {
-			setStopwatchState(props.start());
+			const newState = props.start();
+			setStopwatchState(newState);
+			props.callback(newState);
 			createInterval();
 		} else {
-			setStopwatchState(props.stop());
+			const newState = props.stop();
+			setStopwatchState(newState);
+			props.callback(newState);
 			clearInterval();
 		}
 	};
 
 	const resetStopwatch = () => {
-		setStopwatchState(props.reset());
+		const newState = props.reset();
+		setStopwatchState(newState);
+		props.callback(newState);
 		setCurrentValue(props.getCurrentStopwatchTime());
 		clearInterval();
 	};

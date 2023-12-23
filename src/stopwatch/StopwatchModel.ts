@@ -40,6 +40,10 @@ export class StopwatchModel {
 		return this.getDateString(this.pausedAtOffset);
 	}
 
+	getTimetrackerState(): string {
+		return this.state;
+	}
+
 	setCurrentValue(milliseconds: number): void {
 		this.startedAt = milliseconds;
 		this.pausedAtOffset = Date.now() - this.startedAt;
@@ -49,10 +53,10 @@ export class StopwatchModel {
 		const formattingSettings = !this.plugin.settings.trimLeadingZeros
 			? {
 					trim: 'false',
-			  }
+				}
 			: {
 					trim: 'left',
-			  };
+				};
 		return moment.duration(milliseconds).format(this.plugin.settings.format, formattingSettings);
 	}
 }
